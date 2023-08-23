@@ -1,0 +1,72 @@
+<!-<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+{% load custom_filters %}
+<!-- Подключаем новый файл с нашим тегом -->
+{% load custom_tags %}
+
+<!-- Название у нас будет post -->
+{% block title %}
+Posts
+
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все товары-->
+{% block content %}
+<h1>Все посты</h1>
+<h4>Всего новостей {{posts|length}} </h4>
+<!--<h3>{{ time_now|date:'d M Y' }}</h3>-->
+<!-- А вот так мы используем наш тег-->
+<h3>{% current_time '%d %b %Y' %}</h3>
+<!-- Если в переменной next_sale будет None,
+   то выведется указанный в фильтре текст-->
+<h3> {{ next_sale|default_if_none:"Чуть позже выйдут свежие посты!" }} </h3>
+<hr>
+{% if posts %}
+<table> <!-- Начинаем описывать таблицу -->
+    <tr> <!-- Добавляем строку -->
+        <td><h3> Заголовок:</h3></td>
+        <td><h3> Дата и время поста:</h3></td>
+        <td><h3> текст статьи/новости:</h3></td>
+    </tr>
+
+    {% for post in posts %}
+    <tr>
+        <!-- Используем наш фильтр currency-->
+        <td>{{ post.header|currency:"rub"|censors }}</td>
+        <td>{{ post.datetime_post }}</td>
+        <td>{{ post.content|truncatewords:20|censors }}</td>
+    </tr>
+    {% endfor %}
+</table> <!-- ... и таблицы -->
+
+{% else %}
+<!-- Если товаров нет, говорим, что товаров нет ;) -->
+<h2>Статей и новостей нет!</h2>
+
+
+{% endif %}
+
+{% for contact in page_obj %}
+{# Each "contact" is a Contact model object. #}
+{{ contact.full_name|upper }}<br>
+...
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock content %}

@@ -1,0 +1,1 @@
+# NewsPortal_D10.5
